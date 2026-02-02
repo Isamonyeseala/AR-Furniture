@@ -71,34 +71,20 @@
     </header>
 
     <main>
-        <model-viewer id="sofa" src="https://simple-ar-home.netlify.app/models/low_poly__sofa.glb" alt="3D Sofa Model"
-            <!-- ENABLE AR -->
-            ar
-            ar-modes="webxr scene-viewer quick-look"
-
-            <!-- THIS IS CRITICAL -->
-            ar-placement="floor"
-            ar-scale="fixed"
-
-            <!-- SCALE: adjust if model is too big or small -->
-            scale="1 1 1"
-
-            camera-controls
-            environment-image="neutral"
-            shadow-intensity="1"
-            exposure="1"
-            >
+        <model-viewer id="sofa" src="https://simple-ar-home.netlify.app/models/low_poly__sofa.glb" alt="Sofa 3D model"
+            ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" ar-scale="fixed" scale="1 1 1"
+            camera-controls environment-image="neutral" shadow-intensity="1" exposure="1">
             <button slot="ar-button" style="
-            padding: 10px 14px;
-            border-radius: 8px;
-            background: #0b61ff;
-            color: white;
-            border: none;
-            font-size: 0.95rem;
-          ">
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #0b61ff;
+      color: white;
+      border: none;
+    ">
                 View in your space
             </button>
         </model-viewer>
+
     </main>
 
     <div class="info" id="info">
