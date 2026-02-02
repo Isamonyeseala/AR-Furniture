@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>AR Furniture Demo</title>
+
+    <!-- model-viewer web component -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, Arial, sans-serif;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #111;
+            color: white;
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        model-viewer {
+            width: 100%;
+            max-width: 900px;
+            height: 70vh;
+            background: #eaeaea;
+            border-radius: 12px;
+        }
+
+        .info {
+            max-width: 900px;
+            margin: 12px auto;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .warning {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        .ok {
+            color: #27ae60;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        Furniture AR — Place the sofa in your room
+    </header>
+
+    <main>
+        <model-viewer id="sofa" src="https://simple-ar-home.netlify.app/models/low_poly__sofa.glb" alt="3D Sofa Model"
+            <!-- ENABLE AR -->
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+
+            <!-- THIS IS CRITICAL -->
+            ar-placement="floor"
+            ar-scale="fixed"
+
+            <!-- SCALE: adjust if model is too big or small -->
+            scale="1 1 1"
+
+            camera-controls
+            environment-image="neutral"
+            shadow-intensity="1"
+            exposure="1"
+            >
+            <button slot="ar-button" style="
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #0b61ff;
+            color: white;
+            border: none;
+            font-size: 0.95rem;
+          ">
+                View in your space
+            </button>
+        </model-viewer>
+    </main>
+
+    <div class="info" id="info">
+        <p>
+            Tap <strong>“View in your space”</strong> on mobile to place the sofa on
+            the floor using AR.
+        </p>
+    </div>
+
+    <script>
+        const modelViewer = document.getElementById("sofa");
+        const infoBox = document.getElementById("info");
+
+        /*
+          REAL-WORLD EXPECTED SIZE (meters)
+    
+          Typical 3-seater sofa:
+          Width  ≈ 2.1m
+          Depth  ≈ 0.9m
+          Height ≈ 0.8m
+        */
+        const EXPECTED_SIZE = {
+            width: 2.1,
+            depth: 0.9,
+            height: 0.8,
+        };
+
+        // Fires when the 3D model is fully loaded
+        modelViewer.addEventListener("load", () => {
+            /*
+              modelViewer.getDimensions() returns the bounding box
+              in METERS (important!)
+            */
+            const dimensions = modelViewer.getDimensions();
+
+            const width = dimensions.x;
+            const height = dimensions.y;
+            const depth = dimensions.z;
+
+            let message = `
+          <p>
+            📏 <strong>Detected sofa size:</strong><br>
+            Width: ${width.toFixed(2)} m<br>
+            Depth: ${depth.toFixed(2)} m<br>
+            Height: ${height.toFixed(2)} m
+          </p>
+        `;
+
+            const widthDiff = Math.abs(width - EXPECTED_SIZE.width);
+            const depthDiff = Math.abs(depth - EXPECTED_SIZE.depth);
+
+            /*
+              If the difference is too large,
+              we warn the user that the scale is wrong
+            */
+            if (widthDiff > 0.3 || depthDiff > 0.3) {
+                message += `
+            <p class="warning">
+              ⚠️ This sofa is not correctly scaled for real-world use.
+              It may appear too large or too small in your room.
+            </p>
+          `;
+            } else {
+                message += `
+            <p class="ok">
+              ✅ This sofa is correctly scaled for real-world placement.
+            </p>
+          `;
+            }
+
+            infoBox.innerHTML = message;
+        });
+
+        /*
+          OPTIONAL: listen to AR status changes
+          Useful for debugging
+        */
+        modelViewer.addEventListener("ar-status", (event) => {
+            console.log("AR status:", event.detail.status);
+        });
+    </script>
+</body>
+
+</html>
